@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30523.141
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "offloader", "offloader\offloader.csproj", "{F2DB1D2D-8034-4C87-A451-C63E05D2B026}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F2DB1D2D-8034-4C87-A451-C63E05D2B026}.Debug|x64.ActiveCfg = Debug|x64
+		{F2DB1D2D-8034-4C87-A451-C63E05D2B026}.Debug|x64.Build.0 = Debug|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {61F0AA5B-A5FF-4D98-A3B6-AC11BA62B8DD}
+	EndGlobalSection
+EndGlobal
