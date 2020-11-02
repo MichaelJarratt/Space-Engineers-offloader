@@ -1,2 +1,9 @@
-# Space-Engineers-offloader
-A space engineers script which pulls items from connected grids into an accessible inventories, but only through a specific connector.
+# Space Engineers :: offloader
+This script was designed to run on transport vehicles designed to carry cargo between two places, but it can be adapted to pulling items into a bases containers without too much    modification.  
+  
+The scipt listens for the designated connector connecting with another grid, then pulls all the items (indescriminate) out of connected containers and into containers of the grid running the sctipt.  
+The scipt was designed with Ores in mind, which does matter. For example on a small grid this would not work with certain items, such as steel plates, as only ores and *some* other components can pass through small conveyors.
+
+# How to use this:
+If you still think this script will suite you needs, you may simply copy and paste code excluding the namespace and the class into the programmable block.
+<copy code that is after the second *{* and before the second to last *}*>
