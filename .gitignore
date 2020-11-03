@@ -1,3 +1,6 @@
 #ingore files in these folders#
-offloader/
 .vs/
+offloader.sln
+
+offloader/*
+!offloader/Program.cs #basically just want this file#
