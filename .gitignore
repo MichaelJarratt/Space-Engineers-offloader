@@ -3,4 +3,4 @@
 offloader.sln
 
 offloader/*
-!offloader/Program.cs #basically just want this file#
+!offloader/Program.cs
