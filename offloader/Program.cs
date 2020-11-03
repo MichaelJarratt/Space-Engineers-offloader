@@ -29,7 +29,7 @@ namespace IngameScript
         bool pushFromRear = true; //set to false if you don't want to push items out of rear connector
         List<String> pushInto = new List<String>() //names of containers to push items into
         {   //leave empty to allow any container
-            //names of container to put items into e.g. "small cargo container 1" //
+            //names of container to put items into e.g. "small cargo container 1"
             "Large Cargo Container"
         };
         //##!configuration##
