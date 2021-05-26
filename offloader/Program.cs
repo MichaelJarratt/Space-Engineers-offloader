@@ -20,13 +20,16 @@ using VRageMath;
 namespace IngameScript
 {
     partial class Program : MyGridProgram
-    { 
+    {
         //##configuration##
-        String dockingConnectorName = "Cargo Rover Connector Roof"; //name of connector that miners will unload to
         String meName = "Cargo Rover OrePull"; //name of the programmable block executing the scipt
         String debugPanelName = "Cargo Rover Offloader Debug Panel"; //name of the LCD that this script writes debug info to (screen must be set to display text/images)
-        String rearConnectorName = "Cargo Rover Connector Rear"; //name of connectors to offload inventory into base
+
+        bool pullFromTop = true; //set to false if you don't want to pull items out of a connector
+        String connectorInName = "Cargo Rover Connector Roof"; //name of connector that miners will unload to
+        
         bool pushFromRear = true; //set to false if you don't want to push items out of rear connector
+        String connectorOutName = "Cargo Rover Connector Rear"; //name of connectors to offload inventory into base
         List<String> pushInto = new List<String>() //names of containers to push items into
         {   //leave empty to allow any container
             //names of container to put items into e.g. "small cargo container 1"
@@ -34,8 +37,8 @@ namespace IngameScript
         };
         //##!configuration##
 
-        IMyShipConnector dockingConnector; //the connector an offloading miner will connect to
-        IMyShipConnector rearConnector; //the connector the transporter will connect to to offload items
+        IMyShipConnector connectorIn; //the connector an offloading miner will connect to
+        IMyShipConnector connectorOut; //the connector the transporter will connect to to offload items
         List<IMyInventory> inventories = new List<IMyInventory>(); //list of conveyor-connected inventories on the grid
         List<IMyInventory> connectedInventories = new List<IMyInventory>();
         IMyProgrammableBlock me; //reference to self
@@ -43,9 +46,10 @@ namespace IngameScript
 
         public Program()
         {
+            Echo("all is cool and good");
             me = GridTerminalSystem.GetBlockWithName(meName) as IMyProgrammableBlock; //programmable block running script
-            dockingConnector = GridTerminalSystem.GetBlockWithName(dockingConnectorName) as IMyShipConnector;
-            rearConnector = GridTerminalSystem.GetBlockWithName(rearConnectorName) as IMyShipConnector;
+            connectorIn = GridTerminalSystem.GetBlockWithName(connectorInName) as IMyShipConnector;
+            connectorOut = GridTerminalSystem.GetBlockWithName(connectorOutName) as IMyShipConnector;
             debug = GridTerminalSystem.GetBlockWithName(debugPanelName) as IMyTextPanel; //debug output
             debug.WriteText(""); //Clear debug
             populateInventoriesList(); //populates list with local inventories
@@ -57,24 +61,27 @@ namespace IngameScript
 
         public void Main()
         {
-            if(dockingConnector.Status == MyShipConnectorStatus.Connected) //if docking port is connected to something
+            if (pullFromTop) //is the pull from top feature is enabled
             {
-                populateConnectedInventriesList(); //repopulate it as it updates the contents
-                debug.WriteText("ship connected. Inventories: "+connectedInventories.Count);
-                tryMoveItemsFromDockedToLocal(); //attemps to move items from the connected ships inventories to the rover
-            }
-            else //docking port is not connected
-            {
-                if(connectedInventories.Count != 0) //have only just disconnected
+                if (connectorIn.Status == MyShipConnectorStatus.Connected) //if docking port is connected to something
                 {
-                    connectedInventories.Clear(); //empty list as it is no longer valid
+                    populateConnectedInventriesList(); //repopulate it as it updates the contents
+                    debug.WriteText("ship connected. Inventories: " + connectedInventories.Count);
+                    tryMoveItemsFromDockedToLocal(); //attemps to move items from the connected ships inventories to the rover
                 }
-                debug.WriteText("No ship connected");
+                else //docking port is not connected
+                {
+                    if (connectedInventories.Count != 0) //have only just disconnected
+                    {
+                        connectedInventories.Clear(); //empty list as it is no longer valid
+                    }
+                    debug.WriteText("No ship connected");
+                }
             }
 
             if(pushFromRear) //if the push from rear feature is enabled
             { 
-                if(rearConnector.Status == MyShipConnectorStatus.Connected) //if rear connector is connected to something
+                if(connectorOut.Status == MyShipConnectorStatus.Connected) //if rear connector is connected to something
                 {
                     if(pushInto.Count == 0) //if any inventory can be pushed into
                     {
@@ -202,6 +209,15 @@ namespace IngameScript
         //sets the inventories field with every inventory connected to the grid
         public List<IMyInventory> getAccessableInventories(List<IMyTerminalBlock> blocks)
         {
+            IMyShipConnector compareTo; //the connector which will be used to check if inventory is accessible via conveyors (incase one of the in/out connectors are not used)
+            if(connectorIn == null) //not using the pull from connected inventory feature
+            {
+                compareTo = connectorOut; //if neither are used, the script will crash, but given there is no functionality at all if both features are disabled, it doesn't matter
+            }
+            else //if pull feature is enabled
+            {
+                compareTo = connectorIn;
+            }
             List<IMyInventory> accessibleInvs = new List<IMyInventory>(); //holds accessible inventory objects
             int invCount; //number of inventories the block has
             foreach (IMyTerminalBlock invBlock in blocks) //iterate over blocks
@@ -211,7 +227,7 @@ namespace IngameScript
                 {
                
                     IMyInventory inventory = invBlock.GetInventory(i); //get inventory object
-                    if (dockingConnector.GetInventory().IsConnectedTo(inventory)) //if the inventory is accessable by the connector
+                    if (compareTo.GetInventory().IsConnectedTo(inventory)) //if the inventory is accessable by the connector
                     {
                         accessibleInvs.Add(inventory); //add inventory object to list
                     }
